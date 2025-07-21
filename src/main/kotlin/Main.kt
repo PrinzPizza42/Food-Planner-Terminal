@@ -25,22 +25,24 @@ fun main() {
 fun addDish() {
     println("Enter the name of the dish:")
     val name = readln()
-    if(dishList.contains(Dish(name))) return println("Dish already exists")
+    if(checkIfListContainsDish(name)) return println("Dish already exists")
     else dishList.add(Dish(name))
 }
 
 fun removeDish() {
     println("Enter the name of the dish:")
     val name = readln()
-    if(dishList.contains(Dish(name))) dishList.remove(Dish(name))
+    val dish = getIfListContainsDish(name)
+    if(dish != null) {
+        dishList.remove(dish)
+    }
     else println("Dish does not exist in the list")
 }
 
 fun listDishes() {
     println("--- Dish List ---")
     for (dish in dishList) {
-//        dish.printDish()
-        println(dish.name)
+        dish.printDish()
     }
 }
 
@@ -51,4 +53,18 @@ fun printCommands() {
     println("list: lists all dishes")
     println("exit: exits the program")
     println("-----------------")
+}
+
+fun checkIfListContainsDish(name: String): Boolean {
+    dishList.forEach {
+        if(it.name == name) return true
+    }
+    return false
+}
+
+fun getIfListContainsDish(name: String): Dish? {
+    dishList.forEach {
+        if(it.name == name) return it
+    }
+    return null
 }
