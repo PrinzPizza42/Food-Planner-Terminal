@@ -1,6 +1,6 @@
 package de.luca
 
-val dishList = mutableListOf<Dish>()
+import de.luca.foodPlaner.FoodPlanerManager
 
 fun main() {
     //TODO add ascII art
@@ -8,63 +8,24 @@ fun main() {
 
     while(true) {
         printCommands()
+        println("||MainMenu, enter command>>")
         val input = readln()
-        when(input) {
-            "add" -> addDish()
-            "remove" -> removeDish()
-            "list" -> listDishes()
+        when(input.lowercase()) {
+            "dish list" -> DishListManager.mainMenu()
+            "planner" -> FoodPlanerManager.mainMenu()
             "exit" -> {
                 Data.save()
-                println("Exiting")
+                println("Exiting...")
                 break
             }
         }
     }
 }
 
-fun addDish() {
-    println("Enter the name of the dish:")
-    val name = readln()
-    if(checkIfListContainsDish(name)) return println("Dish already exists")
-    else dishList.add(Dish(name))
-}
-
-fun removeDish() {
-    println("Enter the name of the dish:")
-    val name = readln()
-    val dish = getIfListContainsDish(name)
-    if(dish != null) {
-        dishList.remove(dish)
-    }
-    else println("Dish does not exist in the list")
-}
-
-fun listDishes() {
-    println("--- Dish List ---")
-    for (dish in dishList) {
-        dish.printDish()
-    }
-}
-
 fun printCommands() {
     println("--- Commands ---")
-    println("add: adds a new dish")
-    println("remove: removes a dish")
-    println("list: lists all dishes")
-    println("exit: exits the program")
+    println("dish list: enter dish list manager")
+    println("planner: enter food planner")
+    println("exit: exit the program")
     println("-----------------")
-}
-
-fun checkIfListContainsDish(name: String): Boolean {
-    dishList.forEach {
-        if(it.name == name) return true
-    }
-    return false
-}
-
-fun getIfListContainsDish(name: String): Dish? {
-    dishList.forEach {
-        if(it.name == name) return it
-    }
-    return null
 }

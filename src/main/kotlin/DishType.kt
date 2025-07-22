@@ -1,8 +1,6 @@
 package de.luca
 
-import kotlinx.serialization.Serializable
-
-enum class dishType {
+enum class DishType {
     BREAKFAST,
     LUNCH,
     DINNER,

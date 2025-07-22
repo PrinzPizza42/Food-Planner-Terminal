@@ -1,0 +1,66 @@
+package de.luca.foodPlaner
+
+object FoodPlaner {
+    val days = mutableListOf<FoodPlanerDay>()
+    fun mainMenu() {
+        printCommands()
+        while (true) {
+            println("||MainMenu->FoodPlaner->Planer, enter command>>")
+            val input = readln()
+            val splitInput = input.split(" ")
+            val inputFirstWord = splitInput[0]
+            val inputSecondWord: String? = if(splitInput.size > 1) splitInput[1] else null
+            when (inputFirstWord) {
+                "list" -> listDays()
+                "add" -> addDay(inputSecondWord)
+                "remove" -> removeDay()
+                "exit" -> {
+                    println("Exiting to food planer main menu...")
+                    break
+                }
+            }
+        }
+    }
+
+    fun printCommands() {
+        println("--- Commands ---")
+        println("list: lists all days")
+        println("add: adds a new day at the end")
+        println("remove: removes a new day at the end")
+//        println("edit: edit day syntax: edit <week> <day>") //TODO implement
+        println("exit: exit to food planer main menu")
+        println("-----------------")
+    }
+
+    fun listDays() {
+        if(days.isEmpty()) return println("No days found")
+        println("--- Days ---")
+        var numberOfWeeks = 0
+        days.forEach {
+            if(it.weekDay == WeekDays.MONDAY) {
+                numberOfWeeks++
+                println("--Week $numberOfWeeks--")
+            }
+            println("   " + (it.weekDay.ordinal + 1) + ": " + it.weekDay)
+        }
+    }
+
+    fun addDay(inputSecondWord: String?) {
+        val amountOfDaysToAdd: Int = inputSecondWord?.toIntOrNull() ?: 1
+        if(amountOfDaysToAdd > 100) return println("Can't add more than 100 days")
+        for(i in 1..amountOfDaysToAdd) {
+            val weekDay: WeekDays =
+                if(days.isEmpty()) WeekDays.MONDAY
+                else WeekDays.entries[(days.last().weekDay.ordinal + 1) % 7]
+            days.addLast(FoodPlanerDay(mutableListOf(), weekDay))
+        }
+        println("Added $amountOfDaysToAdd day(s) to the plan")
+    }
+
+    fun removeDay() {
+        if(days.isEmpty()) return println("No days found")
+        val lastDay = days.last()
+        days.removeLast()
+        println("removing " + lastDay.weekDay + ": " + lastDay.meals.size + " meals")
+    }
+}
