@@ -1,5 +1,7 @@
 package de.luca
 
+import de.luca.Tools.getString
+
 object DishListManager {
     val dishList = mutableListOf<Dish>()
 
@@ -11,6 +13,7 @@ object DishListManager {
             when(input) {
                 "add" -> addDish()
                 "remove" -> removeDish()
+                "edit" -> editDish()
                 "list" -> listDishes()
                 "exit" -> {
                     println("Exiting to main menu...")
@@ -20,12 +23,26 @@ object DishListManager {
         }
     }
 
-
     fun addDish() {
+        val dish = Dish("placeholder")
         println("Enter the name of the dish:")
-        val name = readln()
-        if(checkIfListContainsDish(name)) return println("Dish already exists")
-        else dishList.add(Dish(name))
+        dish.name = readln()
+        if(checkIfListContainsDish(dish.name)) return println("Dish already exists")
+
+        while (true) {
+            println("Enter the Type of the dish (${DishType.entries.joinToString(", ")}:")
+            val typeAsString = getString("Only enter one word of the following: ${DishType.entries.joinToString(", ")}", 100)!!.trim().uppercase()
+            try {
+                dish.dishType = DishType.valueOf(typeAsString)
+            }
+            catch (e: IllegalArgumentException) {
+                println("Could not find a dish type for $typeAsString")
+                continue
+            }
+            break
+        }
+
+        dishList.add(dish)
     }
 
     fun removeDish() {
@@ -36,6 +53,17 @@ object DishListManager {
             dishList.remove(dish)
         }
         else println("Dish does not exist in the list")
+    }
+
+    fun editDish() {
+        println("Enter the name of the dish you want to edit:")
+        val name = readln()
+        val dish = getIfListContainsDish(name)
+        if(dish != null) {
+            println("Enter the new name:")
+            val newName = readln()
+            dish.name = newName
+        }
     }
 
     fun listDishes() {

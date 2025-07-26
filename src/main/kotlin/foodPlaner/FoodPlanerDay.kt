@@ -1,5 +1,10 @@
 package de.luca.foodPlaner
 
-data class FoodPlanerDay(val meals: MutableList<FoodPlanerMeal>, val weekDay: WeekDays) {
-//    val absoluteKJ
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class FoodPlanerDay(
+    val meals: MutableList<FoodPlanerMeal>,
+    val weekDay: WeekDays
+    //    val absoluteKJ
+)

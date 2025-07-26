@@ -1,11 +1,10 @@
 package de.luca.foodPlaner
 
 import de.luca.Dish
-import de.luca.DishType
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class FoodPlanerMeal(
     var dish: Dish?,
     var time: Float?
-) {
-    val dishType: DishType? = dish?.dishType
-}
+)

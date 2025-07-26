@@ -4,5 +4,6 @@ enum class DishType {
     BREAKFAST,
     LUNCH,
     DINNER,
-    SNACK
+    SNACK,
+    DESSERT
 }

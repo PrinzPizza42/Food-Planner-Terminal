@@ -1,8 +1,17 @@
 package de.luca.foodPlaner
 
+import de.luca.Data
+import de.luca.Dish
+import de.luca.DishListManager
+import de.luca.DishType
+import de.luca.foodPlaner.FoodPlanerSettings.foodPlanerSettingsData
+
 object FoodPlaner {
     val days = mutableListOf<FoodPlanerDay>()
     fun mainMenu() {
+        if(days.isEmpty()) {
+            addDay("7")
+        }
         printCommands()
         while (true) {
             println("||MainMenu->FoodPlaner->Planer, enter command>>")
@@ -12,6 +21,7 @@ object FoodPlaner {
             val inputSecondWord: String? = if(splitInput.size > 1) splitInput[1] else null
             when (inputFirstWord) {
                 "list" -> listDays()
+                "run" -> generateMealPlan()
                 "add" -> addDay(inputSecondWord)
                 "remove" -> removeDay()
                 "exit" -> {
@@ -25,6 +35,7 @@ object FoodPlaner {
     fun printCommands() {
         println("--- Commands ---")
         println("list: lists all days")
+        println("run: fills the days with meals based on the settings and dishes")
         println("add: adds a new day at the end")
         println("remove: removes a new day at the end")
 //        println("edit: edit day syntax: edit <week> <day>") //TODO implement
@@ -62,5 +73,33 @@ object FoodPlaner {
         val lastDay = days.last()
         days.removeLast()
         println("removing " + lastDay.weekDay + ": " + lastDay.meals.size + " meals")
+    }
+
+    fun generateMealPlan() {
+        for (day in days) {
+            val isWeekend = day.weekDay == WeekDays.SATURDAY || day.weekDay == WeekDays.SUNDAY
+                val numberOfMeals = if(isWeekend && foodPlanerSettingsData.weekEndDiffers) foodPlanerSettingsData.mealsPerDayWeekend.size else foodPlanerSettingsData.mealsPerDay.size
+                val mealsPerDay = if(isWeekend && foodPlanerSettingsData.weekEndDiffers) foodPlanerSettingsData.mealsPerDayWeekend else foodPlanerSettingsData.mealsPerDay
+            for (i in 1..numberOfMeals) {
+                val dishType = mealsPerDay[i - 1]
+                val dish = getRandomDish(dishType)
+                if(dish == null) {
+                    println("Could not generate a dish for $dishType")
+                    continue
+                }
+                println("found Dish: ${dish.name}")
+                day.meals.add(FoodPlanerMeal(dish, null))
+                Data.saveGeneratedPlan(days)
+            }
+        }
+    }
+
+    fun getRandomDish(dishType: DishType): Dish? {
+        val filteredDishList = DishListManager.dishList.filter { it.dishType == dishType }
+        if(filteredDishList.isEmpty()) {
+            println("Could not generate a dish because there are no dishes of type: $dishType")
+            return null
+        }
+        return filteredDishList.randomOrNull()
     }
 }
