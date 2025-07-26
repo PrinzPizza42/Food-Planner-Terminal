@@ -5,6 +5,7 @@ import de.luca.foodPlaner.FoodPlanerManager
 fun main() {
     //TODO add ascII art
     Data.loadDishList()
+    Data.loadSettings()
 
     while(true) {
         printCommands()
@@ -15,6 +16,7 @@ fun main() {
             "planner" -> FoodPlanerManager.mainMenu()
             "exit" -> {
                 Data.saveDishList()
+                Data.saveSettings()
                 println("Exiting...")
                 break
             }

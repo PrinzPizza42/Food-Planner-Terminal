@@ -32,7 +32,7 @@ object FoodPlaner {
         }
     }
 
-    fun printCommands() {
+    private fun printCommands() {
         println("--- Commands ---")
         println("list: lists all days")
         println("run: fills the days with meals based on the settings and dishes")
@@ -43,7 +43,7 @@ object FoodPlaner {
         println("-----------------")
     }
 
-    fun listDays() {
+    private fun listDays() {
         if(days.isEmpty()) return println("No days found")
         println("--- Days ---")
         var numberOfWeeks = 0
@@ -56,7 +56,7 @@ object FoodPlaner {
         }
     }
 
-    fun addDay(inputSecondWord: String?) {
+    private fun addDay(inputSecondWord: String?) {
         val amountOfDaysToAdd: Int = inputSecondWord?.toIntOrNull() ?: 1
         if(amountOfDaysToAdd > 100) return println("Can't add more than 100 days")
         for(i in 1..amountOfDaysToAdd) {
@@ -68,14 +68,14 @@ object FoodPlaner {
         println("Added $amountOfDaysToAdd day(s) to the plan")
     }
 
-    fun removeDay() {
+    private fun removeDay() {
         if(days.isEmpty()) return println("No days found")
         val lastDay = days.last()
         days.removeLast()
         println("removing " + lastDay.weekDay + ": " + lastDay.meals.size + " meals")
     }
 
-    fun generateMealPlan() {
+    private fun generateMealPlan() {
         for (day in days) {
             val isWeekend = day.weekDay == WeekDays.SATURDAY || day.weekDay == WeekDays.SUNDAY
                 val numberOfMeals = if(isWeekend && foodPlanerSettingsData.weekEndDiffers) foodPlanerSettingsData.mealsPerDayWeekend.size else foodPlanerSettingsData.mealsPerDay.size
@@ -89,12 +89,12 @@ object FoodPlaner {
                 }
                 println("found Dish: ${dish.name}")
                 day.meals.add(FoodPlanerMeal(dish, null))
-                Data.saveGeneratedPlan(days)
             }
         }
+        Data.saveGeneratedPlan(days)
     }
 
-    fun getRandomDish(dishType: DishType): Dish? {
+    private fun getRandomDish(dishType: DishType): Dish? {
         val filteredDishList = DishListManager.dishList.filter { it.dishType == dishType }
         if(filteredDishList.isEmpty()) {
             println("Could not generate a dish because there are no dishes of type: $dishType")

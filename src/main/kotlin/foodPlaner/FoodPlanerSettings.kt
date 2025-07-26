@@ -8,7 +8,6 @@ object FoodPlanerSettings {
 
     fun mainMenu() {
         printCommands()
-        Data.loadSettings()
 
         while(true) {
             println("||MainMenu->FoodPlaner->Settings, enter command>>")
@@ -19,7 +18,6 @@ object FoodPlanerSettings {
                 "weekEndMeals" -> mealsPerDayWeekend()
                 "exit" -> {
                     println("Exiting to food planer...")
-                    Data.saveSettings()
                     break
                 }
             }
