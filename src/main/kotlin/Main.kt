@@ -4,6 +4,7 @@ import de.luca.foodPlaner.FoodPlanerManager
 
 fun main() {
     //TODO add ascII art
+    Data.handleDirSetup()
     Data.loadDishList()
     Data.loadSettings()
 

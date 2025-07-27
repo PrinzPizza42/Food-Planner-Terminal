@@ -4,6 +4,8 @@ import de.luca.Tools.getString
 
 object DishListManager {
     val dishList = mutableListOf<Dish>()
+    var skipOverwrite = false
+    var allOverWrite = false
 
     fun mainMenu() {
         printCommands()
@@ -14,6 +16,7 @@ object DishListManager {
                 "add" -> addDish()
                 "remove" -> removeDish()
                 "edit" -> editDish()
+                "import" -> Data.importExternalDishList()
                 "list" -> listDishes()
                 "exit" -> {
                     println("Exiting to main menu...")
@@ -44,6 +47,56 @@ object DishListManager {
 
         dishList.add(dish)
     }
+
+    fun importDish(dish: Dish): Boolean {
+        if(checkIfListContainsDish(dish.name)) {
+            if(skipOverwrite) {
+                println("Skipping import of ${dish.name}")
+                return false
+            }
+            else if(allOverWrite) {
+                println("Overwriting dish...")
+                dishList.remove(getIfListContainsDish(dish.name)!!)
+                dishList.add(dish)
+                println("Successfully imported ${dish.name}")
+                return true
+            }
+
+            println("Dish ${dish.name} already exists, do you want to overwrite it? (yes/no/skip/all)")
+            val input: String = getString("yes/no/skip/all", 100)!!.trim().uppercase()
+            when(input) {
+                "SKIP" -> {
+                    skipOverwrite = true
+                    println("Skipping all following overwriting imports")
+                    return false
+                }
+                "ALL" -> {
+                    allOverWrite = true
+                    println("Always overwrite all following imports")
+                    dishList.remove(getIfListContainsDish(dish.name)!!)
+                    dishList.add(dish)
+                    println("Successfully imported ${dish.name}")
+                    return true
+                }
+                "YES" -> {
+                    dishList.remove(getIfListContainsDish(dish.name)!!)
+                    dishList.add(dish)
+                    println("Successfully imported ${dish.name}")
+                    return true
+                }
+                else -> {
+                    println("Aborting import of ${dish.name}")
+                    return false
+                }
+            }
+        }
+        else {
+            dishList.add(dish)
+            return true
+        }
+    }
+
+
 
     fun removeDish() {
         println("Enter the name of the dish:")
@@ -77,6 +130,8 @@ object DishListManager {
         println("--- Commands ---")
         println("add: adds a new dish")
         println("remove: removes a dish")
+        println("edit: edit a dish")
+        println("import: import a dish list from a .csv file from ${Data.dataPathImportDishListFolder}")
         println("list: lists all dishes")
         println("exit: exit to main menu")
         println("-----------------")
