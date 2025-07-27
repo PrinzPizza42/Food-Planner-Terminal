@@ -13,6 +13,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation(kotlin("reflect"))
 }
 
 tasks.test {

@@ -2,6 +2,8 @@ package de.luca.foodPlaner
 
 import de.luca.Data
 import de.luca.DishType
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.valueParameters
 
 object FoodPlanerSettings {
     var foodPlanerSettingsData = FoodPlanerSettingsData()
@@ -16,6 +18,7 @@ object FoodPlanerSettings {
                 "meals" -> mealsPerDay()
                 "weekEndDiffers" -> weekEndDiffers()
                 "weekEndMeals" -> mealsPerDayWeekend()
+                "list" -> listSettings()
                 "exit" -> {
                     println("Exiting to food planer...")
                     break
@@ -31,8 +34,17 @@ object FoodPlanerSettings {
         println("weekEndMeals: change the meals a day on a weekend should have")
 //        println("useCalories: change if the calories should be used to plan the meals")
 //        println("calories: set the max calories a day can have")
+        println("list: list current settings")
         println("exit: exit to food planer")
         println("-----------------")
+    }
+
+    private fun listSettings() {
+        for (property in FoodPlanerSettingsData::class.memberProperties) {
+            val name = property.name
+            val value = property.get(foodPlanerSettingsData)
+            println("$name: $value")
+        }
     }
 
     fun mealsPerDay() {
