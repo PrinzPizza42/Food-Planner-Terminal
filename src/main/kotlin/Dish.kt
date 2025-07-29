@@ -1,5 +1,6 @@
 package de.luca
 
+import de.luca.foodPlaner.Ingredient
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.time.LocalDate
@@ -13,7 +14,8 @@ data class Dish(
     var dishType: DishType? = null,
     var timeToCreate: Float = 0.0f,
     var lastCooked: String? = null,
-    var price: Float = 0.0f
+    var price: Float = 0.0f,
+    var ingredients: MutableList<Ingredient> = mutableListOf()
 ) {
     @Transient
     var priceAsString: String = "$price €"
@@ -22,5 +24,9 @@ data class Dish(
 
     fun printDish() {
         println("-Name: ${name} | Price: ${priceAsString} | Type: ${dishType}")
+    }
+
+    fun convertIngredientStringToData(stringList: MutableList<String>) {
+
     }
 }

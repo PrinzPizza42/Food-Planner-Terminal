@@ -1,7 +1,8 @@
 package de.luca
 
 import de.luca.DishListManager.dishList
-import de.luca.foodPlaner.FoodPlanerDay
+import de.luca.foodPlaner.Day
+import de.luca.foodPlaner.Ingredient
 import de.luca.foodPlaner.FoodPlanerSettings.foodPlanerSettingsData
 import de.luca.foodPlaner.FoodPlanerSettingsData
 import de.luca.foodPlaner.WeekDays
@@ -83,7 +84,8 @@ object Data {
         println("Importing $fileName...")
         val dishListCSV = dataPathImportDishListFolder.resolve(fileName).toFile().readText()
         val categories = dishListCSV.split("\n").toMutableList()[0].split(",").toMutableList()
-        val categoryDishTypeIndex: Int = if(categories.contains("DishType")) categories.indexOf("Tags") else 4
+        val categoryDishTypeIndex: Int = if(categories.contains("Tags")) categories.indexOf("Tags") else 4
+        val categoryIngredientsIndex: Int = if(categories.contains("Zutaten")) categories.indexOf("Tags") else 7
         println("Categories: ${categories.joinToString("; ")}")
         val dishes = dishListCSV.split("\n").toMutableList().drop(1).toMutableList()
         var importedDishes = 0
@@ -92,13 +94,53 @@ object Data {
             val dishSplit = dish.split(",").toMutableList()
             val dishName = dishSplit[0].trim()
             val dishTypeString = dishSplit[categoryDishTypeIndex].trim()
+
+            val dishIngredients = mutableListOf<Ingredient>()
+            dishSplit[categoryIngredientsIndex].trim().split(";").toMutableList().forEach {
+                var splitIngredient = it.split(" ")
+                if(splitIngredient[0] == "") splitIngredient = splitIngredient.drop(1)
+                if(splitIngredient.isEmpty()) return@forEach
+
+                var amount: Int = 1
+                var unit: String = "x"
+                var name: String = "name"
+
+                when (splitIngredient.size) {
+                    2 -> {
+                        name = splitIngredient[1].trim()
+                        try {
+                            amount = splitIngredient[0].trim().toInt()
+                        }
+                        catch (e: NumberFormatException) {
+                            println("Could not get ingredient amount ${splitIngredient[0].trim()} from ingredient $name from dish $dishName")
+                            return@forEach
+                        }
+                    }
+                    3 -> {
+                        unit = splitIngredient[1].trim()
+                        name = splitIngredient[2].trim()
+                        try {
+                            amount = splitIngredient[0].trim().toInt()
+                        }
+                        catch (e: NumberFormatException) {
+                            println("Could not get ingredient amount ${splitIngredient[0].trim()} from ingredient $name from dish $dishName")
+                            return@forEach
+                        }
+                    }
+                }
+
+                dishIngredients.add(Ingredient(amount, unit, name))
+            }
+
             val importedDish = Dish(dishName)
             importedDish.dishType = getMappedDishType(dishTypeString)
+            importedDish.ingredients = dishIngredients
+
             val imported: Boolean = DishListManager.importDish(importedDish)
             if(imported) importedDishes++
         }
 
-        println("Successfully imported ${dishes.size} dishes")
+        println("Successfully imported $importedDishes dish(es)")
         saveDishList()
         DishListManager.skipOverwrite = false
         DishListManager.allOverWrite = false
@@ -107,13 +149,13 @@ object Data {
     private fun getMappedDishType(dishType: String): DishType =
         when(dishType) {
             "Mahlzeit" -> DishType.DINNER
-            "Frühstück" -> DishType.BREAKFAST
+            "Frühstück" -> DishType.BREAKFAST
             "Dessert" -> DishType.DESSERT
             "Snack" -> DishType.SNACK
             else -> DishType.DINNER
         }
 
-    fun saveGeneratedPlan(days: MutableList<FoodPlanerDay>) {
+    fun saveGeneratedPlan(days: MutableList<Day>) {
         if(!dataPathPlanesFolder.exists()) Files.createDirectories(dataPathPlanesFolder)
         println("Saving generated plan...")
         val localTime = LocalTime.now().toString().replace(":", "_")
@@ -121,6 +163,7 @@ object Data {
         val daysString = mutableListOf<String>()
 
         //Write days
+        dataPathPlan.toFile().writeText(daysString.joinToString("---Plan---\n\n"))
         var numberOfWeeks = 0
         for(day in days) {
             if(day.weekDay == WeekDays.MONDAY) {
@@ -141,15 +184,26 @@ object Data {
         dataPathPlan.toFile().writeText(daysString.joinToString("\n\n"))
 
         //Write ingredients
-//        val ingredients = mutableListOf<String>()
-//        for(day in days) {
-//            if(day.meals.isEmpty()) continue
-//            for(meal in day.meals) {
-//                if(meal.dish!!.ingredients.isEmpty()) continue
-//                val ingredientsString = meal.dish!!.ingredients.joinToString(", ")
-//                ingredients.addLast(ingredientsString)
-//            }
-//        }
-//        val ingredientsString = ingredients.joinToString("\n")
+        dataPathPlan.toFile().writeText(daysString.joinToString("---Ingredients---\n\n"))
+        val ingredients = mutableListOf<String>()
+        val dishesWithoutIngredients = mutableListOf(Dish)
+
+        for(day in days) {
+            if(day.meals.isEmpty()) continue
+            for(meal in day.meals) {
+                val mealIngredients = meal.dish!!.ingredients
+                if(mealIngredients.isEmpty()) continue
+//
+//                for (ingredient in mealIngredients) {
+//                    val amount
+//                    val unit
+//                    val name
+//                }
+
+                val ingredientsString = meal.dish!!.ingredients.joinToString("\n-")
+                ingredients.addLast(ingredientsString)
+            }
+        }
+        val ingredientsString = ingredients.joinToString("\n")
     }
 }

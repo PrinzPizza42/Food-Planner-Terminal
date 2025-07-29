@@ -7,7 +7,7 @@ import de.luca.DishType
 import de.luca.foodPlaner.FoodPlanerSettings.foodPlanerSettingsData
 
 object FoodPlaner {
-    val days = mutableListOf<FoodPlanerDay>()
+    val days = mutableListOf<Day>()
     fun mainMenu() {
         if(days.isEmpty()) {
             addDay("7")
@@ -63,7 +63,7 @@ object FoodPlaner {
             val weekDay: WeekDays =
                 if(days.isEmpty()) WeekDays.MONDAY
                 else WeekDays.entries[(days.last().weekDay.ordinal + 1) % 7]
-            days.addLast(FoodPlanerDay(mutableListOf(), weekDay))
+            days.addLast(Day(mutableListOf(), weekDay))
         }
         println("Added $amountOfDaysToAdd day(s) to the plan")
     }
@@ -77,6 +77,7 @@ object FoodPlaner {
 
     private fun generateMealPlan() {
         for (day in days) {
+            day.resetMeals()
             val isWeekend = day.weekDay == WeekDays.SATURDAY || day.weekDay == WeekDays.SUNDAY
                 val numberOfMeals = if(isWeekend && foodPlanerSettingsData.weekEndDiffers) foodPlanerSettingsData.mealsPerDayWeekend.size else foodPlanerSettingsData.mealsPerDay.size
                 val mealsPerDay = if(isWeekend && foodPlanerSettingsData.weekEndDiffers) foodPlanerSettingsData.mealsPerDayWeekend else foodPlanerSettingsData.mealsPerDay
@@ -88,7 +89,7 @@ object FoodPlaner {
                     continue
                 }
                 println("found Dish: ${dish.name}")
-                day.meals.add(FoodPlanerMeal(dish, null))
+                day.meals.add(Meal(dish, null))
             }
         }
         Data.saveGeneratedPlan(days)
