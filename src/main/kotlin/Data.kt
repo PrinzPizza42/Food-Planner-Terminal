@@ -1,18 +1,15 @@
 package de.luca
 
 import de.luca.DishListManager.dishList
-import de.luca.foodPlaner.Day
-import de.luca.foodPlaner.Ingredient
+import de.luca.foodPlaner.*
 import de.luca.foodPlaner.FoodPlanerSettings.foodPlanerSettingsData
-import de.luca.foodPlaner.FoodPlanerSettingsData
-import de.luca.foodPlaner.WeekDays
 import kotlinx.serialization.json.Json
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
+import java.nio.file.*
 import java.time.LocalDate
 import java.time.LocalTime
+import kotlin.io.path.appendText
 import kotlin.io.path.exists
+import kotlin.io.path.writeText
 
 object Data {
     private val dataPath: Path = Paths.get(System.getProperty("user.home"), ".food_planner")
@@ -162,13 +159,16 @@ object Data {
         val dataPathPlan = dataPathPlanesFolder.resolve("plan_${LocalDate.now()}_${localTime}.txt")
         val daysString = mutableListOf<String>()
 
-        //Write days
-        dataPathPlan.toFile().writeText(daysString.joinToString("---Plan---\n\n"))
+        //Create file
+        dataPathPlan.writeText("Food-Planner-Terminal by Luca\n\n")
+
+        //Days
+        dataPathPlan.appendText("---Plan---\n\n")
         var numberOfWeeks = 0
         for(day in days) {
             if(day.weekDay == WeekDays.MONDAY) {
                 numberOfWeeks++
-                daysString.addLast("--Week $numberOfWeeks--")
+                daysString.addLast("/ --Week $numberOfWeeks--\n|")
             }
             if(day.meals.isEmpty()) continue
             val mealStringList = mutableListOf<String>()
@@ -176,34 +176,66 @@ object Data {
                 mealStringList.add("${meal.dish!!.dishType!!.name}: ${meal.dish!!.name}")
             }
             val mealsString: String = mealStringList.joinToString("\n")
-            val dayString =
-                "-${day.weekDay}-" +
-                "\n$mealsString"
+            val dayString = "| -${day.weekDay}-" + "\n| $mealsString"
             daysString.addLast(dayString)
         }
-        dataPathPlan.toFile().writeText(daysString.joinToString("\n\n"))
+        dataPathPlan.appendText(daysString.joinToString("\n"))
 
-        //Write ingredients
-        dataPathPlan.toFile().writeText(daysString.joinToString("---Ingredients---\n\n"))
-        val ingredients = mutableListOf<String>()
-        val dishesWithoutIngredients = mutableListOf(Dish)
+        //Ingredients
+        dataPathPlan.appendText("\n\n---Ingredients---\n\n")
+        val mealsWithoutIngredients = mutableListOf<Dish>()
 
+        val ingredients = mutableListOf<Ingredient>()
+        val ingredientsAmountMap = HashMap<String, Int>()
+
+        //Get all ingredients
         for(day in days) {
             if(day.meals.isEmpty()) continue
             for(meal in day.meals) {
                 val mealIngredients = meal.dish!!.ingredients
-                if(mealIngredients.isEmpty()) continue
-//
-//                for (ingredient in mealIngredients) {
-//                    val amount
-//                    val unit
-//                    val name
-//                }
-
-                val ingredientsString = meal.dish!!.ingredients.joinToString("\n-")
-                ingredients.addLast(ingredientsString)
+                if(mealIngredients.isEmpty()) {
+                    mealsWithoutIngredients.add(meal.dish!!)
+                    continue
+                }
+                ingredients.addAll(mealIngredients)
             }
         }
-        val ingredientsString = ingredients.joinToString("\n")
+        println(ingredients)
+
+        //convert to and fill HashMap
+        for (ing in ingredients) {
+            val string = "${ing.unit}  ${ing.name}"
+            val amount = ing.amount
+            if(ingredientsAmountMap.contains(string)) {
+                println("found map containing same string")
+                val amountBefore = ingredientsAmountMap.get(string)
+
+                if(amountBefore == null) {
+                    println("Could not get amount of $string")
+                    continue
+                }
+
+                val amountAfter = amountBefore + amount
+                ingredientsAmountMap.set(string, amountAfter)
+            }
+            else ingredientsAmountMap.set(string, amount)
+        }
+
+        //get string for every ingredient in map
+        val ingredientsAsStrings = mutableListOf<String>()
+        ingredientsAmountMap.forEach{
+            val string = it.key
+            val amount = it.value
+
+            val combined = " - $amount $string"
+            ingredientsAsStrings.add(combined)
+        }
+
+        //combine all strings into one
+        val ingredientsCombinedString = ingredientsAsStrings.joinToString("\n")
+        println(ingredientsCombinedString)
+
+        //write to file
+        dataPathPlan.appendText(ingredientsCombinedString)
     }
 }
