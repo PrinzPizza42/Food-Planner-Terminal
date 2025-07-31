@@ -85,10 +85,9 @@ object FoodPlaner {
                 val dishType = mealsPerDay[i - 1]
                 val dish = getRandomDish(dishType)
                 if(dish == null) {
-                    println("Could not generate a dish for $dishType")
+                    println("Could not find a dish for $dishType because there are no dishes of that type in the dish list")
                     continue
                 }
-                println("found Dish: ${dish.name}")
                 day.meals.add(Meal(dish, null))
             }
         }
@@ -98,7 +97,6 @@ object FoodPlaner {
     private fun getRandomDish(dishType: DishType): Dish? {
         val filteredDishList = DishListManager.dishList.filter { it.dishType == dishType }
         if(filteredDishList.isEmpty()) {
-            println("Could not generate a dish because there are no dishes of type: $dishType")
             return null
         }
         return filteredDishList.randomOrNull()

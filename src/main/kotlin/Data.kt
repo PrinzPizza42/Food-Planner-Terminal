@@ -175,8 +175,8 @@ object Data {
             for(meal in day.meals) {
                 mealStringList.add("${meal.dish!!.dishType!!.name}: ${meal.dish!!.name}")
             }
-            val mealsString: String = mealStringList.joinToString("\n")
-            val dayString = "|\n|${day.weekDay}" + "\n| -$mealsString"
+            val mealsString: String = mealStringList.joinToString("\n| - ")
+            val dayString = "|\n|${day.weekDay}\n| - $mealsString"
             daysString.addLast(dayString)
         }
         dataPathPlan.appendText(daysString.joinToString("\n"))
@@ -200,14 +200,12 @@ object Data {
                 ingredients.addAll(mealIngredients)
             }
         }
-        println(ingredients)
 
         //convert to and fill HashMap
         for (ing in ingredients) {
             val string = "${ing.unit}  ${ing.name}"
             val amount = ing.amount
             if(ingredientsAmountMap.contains(string)) {
-                println("found map containing same string")
                 val amountBefore = ingredientsAmountMap.get(string)
 
                 if(amountBefore == null) {
@@ -233,12 +231,16 @@ object Data {
 
         //combine all strings into one
         val ingredientsCombinedString = ingredientsAsStrings.joinToString("\n")
-        println(ingredientsCombinedString)
 
         //write to file
         dataPathPlan.appendText(ingredientsCombinedString)
 
-        dataPathPlan.appendText("\n-Meals without specified ingredients-\n")
-        dataPathPlan.appendText(mealsWithoutIngredients.joinToString("\n"))
+        val mealsWithoutIngredientsNames = mutableListOf<String>()
+        mealsWithoutIngredients.forEach {
+            if(!mealsWithoutIngredientsNames.contains(it.name)) mealsWithoutIngredientsNames.add(it.name)
+        }
+
+        dataPathPlan.appendText("\n\n-Meals without specified ingredients-\n")
+        dataPathPlan.appendText(" - ${mealsWithoutIngredientsNames.joinToString("\n - ")}")
     }
 }
