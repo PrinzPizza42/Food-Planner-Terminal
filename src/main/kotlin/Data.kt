@@ -160,15 +160,15 @@ object Data {
         val daysString = mutableListOf<String>()
 
         //Create file
-        dataPathPlan.writeText("Food-Planner-Terminal by Luca\n\n")
+        dataPathPlan.writeText("Food-Planner-Terminal by Luca\n")
 
         //Days
-        dataPathPlan.appendText("---Plan---\n\n")
+        dataPathPlan.appendText("---Plan---\n")
         var numberOfWeeks = 0
         for(day in days) {
             if(day.weekDay == WeekDays.MONDAY) {
                 numberOfWeeks++
-                daysString.addLast("/ --Week $numberOfWeeks--\n|")
+                daysString.addLast("\n/Week $numberOfWeeks")
             }
             if(day.meals.isEmpty()) continue
             val mealStringList = mutableListOf<String>()
@@ -176,7 +176,7 @@ object Data {
                 mealStringList.add("${meal.dish!!.dishType!!.name}: ${meal.dish!!.name}")
             }
             val mealsString: String = mealStringList.joinToString("\n")
-            val dayString = "| -${day.weekDay}-" + "\n| $mealsString"
+            val dayString = "|\n|${day.weekDay}" + "\n| -$mealsString"
             daysString.addLast(dayString)
         }
         dataPathPlan.appendText(daysString.joinToString("\n"))
@@ -237,5 +237,8 @@ object Data {
 
         //write to file
         dataPathPlan.appendText(ingredientsCombinedString)
+
+        dataPathPlan.appendText("\n-Meals without specified ingredients-\n")
+        dataPathPlan.appendText(mealsWithoutIngredients.joinToString("\n"))
     }
 }
