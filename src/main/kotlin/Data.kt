@@ -98,7 +98,7 @@ object Data {
                 if(splitIngredient[0] == "") splitIngredient = splitIngredient.drop(1)
                 if(splitIngredient.isEmpty()) return@forEach
 
-                var amount: Int = 1
+                var amount: Float = 1f
                 var unit: String = "x"
                 var name: String = "name"
 
@@ -106,7 +106,7 @@ object Data {
                     2 -> {
                         name = splitIngredient[1].trim()
                         try {
-                            amount = splitIngredient[0].trim().toInt()
+                            amount = splitIngredient[0].trim().toFloat()
                         }
                         catch (e: NumberFormatException) {
                             println("Could not get ingredient amount ${splitIngredient[0].trim()} from ingredient $name from dish $dishName")
@@ -117,7 +117,7 @@ object Data {
                         unit = splitIngredient[1].trim()
                         name = splitIngredient[2].trim()
                         try {
-                            amount = splitIngredient[0].trim().toInt()
+                            amount = splitIngredient[0].trim().toFloat()
                         }
                         catch (e: NumberFormatException) {
                             println("Could not get ingredient amount ${splitIngredient[0].trim()} from ingredient $name from dish $dishName")
@@ -186,7 +186,7 @@ object Data {
         val mealsWithoutIngredients = mutableListOf<Dish>()
 
         val ingredients = mutableListOf<Ingredient>()
-        val ingredientsAmountMap = HashMap<String, Int>()
+        val ingredientsAmountMap = HashMap<String, Float>()
 
         //Get all ingredients
         for(day in days) {
@@ -206,14 +206,14 @@ object Data {
             val string = "${ing.unit}  ${ing.name}"
             val amount = ing.amount
             if(ingredientsAmountMap.contains(string)) {
-                val amountBefore = ingredientsAmountMap.get(string)
+                val amountBefore: Float? = ingredientsAmountMap.get(string)
 
                 if(amountBefore == null) {
                     println("Could not get amount of $string")
                     continue
                 }
 
-                val amountAfter = amountBefore + amount
+                val amountAfter: Float = amountBefore + amount
                 ingredientsAmountMap.set(string, amountAfter)
             }
             else ingredientsAmountMap.set(string, amount)
@@ -221,7 +221,7 @@ object Data {
 
         //get string for every ingredient in map
         val ingredientsAsStrings = mutableListOf<String>()
-        ingredientsAmountMap.forEach{
+        ingredientsAmountMap.forEach {
             val string = it.key
             val amount = it.value
 
