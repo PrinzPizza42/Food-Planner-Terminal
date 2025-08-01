@@ -242,5 +242,7 @@ object Data {
 
         dataPathPlan.appendText("\n\n-Meals without specified ingredients-\n")
         dataPathPlan.appendText(" - ${mealsWithoutIngredientsNames.joinToString("\n - ")}")
+
+        println("Saved new plan ${dataPathPlan.fileName} in ${dataPathPlan.parent.toAbsolutePath()}")
     }
 }
