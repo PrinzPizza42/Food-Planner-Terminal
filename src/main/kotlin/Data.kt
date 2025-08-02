@@ -83,6 +83,7 @@ object Data {
         val categories = dishListCSV.split("\n").toMutableList()[0].split(",").toMutableList()
         val categoryDishTypeIndex: Int = if(categories.contains("Tags")) categories.indexOf("Tags") else 4
         val categoryIngredientsIndex: Int = if(categories.contains("Zutaten")) categories.indexOf("Tags") else 7
+        val categoryKCALIndex: Int = if(categories.contains("KCAL")) categories.indexOf("KCAL") else 8
         println("Categories: ${categories.joinToString("; ")}")
         val dishes = dishListCSV.split("\n").toMutableList().drop(1).toMutableList()
         var importedDishes = 0
@@ -90,8 +91,12 @@ object Data {
         for(dish in dishes) {
             val dishSplit = dish.split(",").toMutableList()
             val dishName = dishSplit[0].trim()
+            val importedDish = Dish(dishName)
+
+            //DishType
             val dishTypeString = dishSplit[categoryDishTypeIndex].trim()
 
+            //Ingredients
             val dishIngredients = mutableListOf<Ingredient>()
             dishSplit[categoryIngredientsIndex].trim().split(";").toMutableList().forEach {
                 var splitIngredient = it.split(" ")
@@ -129,7 +134,15 @@ object Data {
                 dishIngredients.add(Ingredient(amount, unit, name))
             }
 
-            val importedDish = Dish(dishName)
+            //KCAL
+            println(categories)
+            val dishKcal = dishSplit[categoryKCALIndex].trim().toIntOrNull()
+            if(dishKcal == null) {
+                println("Could not get Kcal amount from dish $dishName")
+                continue
+            }
+            importedDish.kCal = dishKcal
+
             importedDish.dishType = getMappedDishType(dishTypeString)
             importedDish.ingredients = dishIngredients
 

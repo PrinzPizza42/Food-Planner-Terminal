@@ -15,7 +15,8 @@ data class Dish(
     var timeToCreate: Float = 0.0f,
     var lastCooked: String? = null,
     var price: Float = 0.0f,
-    var ingredients: MutableList<Ingredient> = mutableListOf()
+    var ingredients: MutableList<Ingredient> = mutableListOf(),
+    var kCal: Int = 0
 ) {
     @Transient
     var priceAsString: String = "$price €"
