@@ -26,28 +26,6 @@ object DishListManager {
         }
     }
 
-    fun addDish() {
-        val dish = Dish("placeholder")
-        println("Enter the name of the dish:")
-        dish.name = readln()
-        if(checkIfListContainsDish(dish.name)) return println("Dish already exists")
-
-        while (true) {
-            println("Enter the Type of the dish (${DishType.entries.joinToString(", ")}:")
-            val typeAsString = getString("Only enter one word of the following: ${DishType.entries.joinToString(", ")}", 100)!!.trim().uppercase()
-            try {
-                dish.dishType = DishType.valueOf(typeAsString)
-            }
-            catch (e: IllegalArgumentException) {
-                println("Could not find a dish type for $typeAsString")
-                continue
-            }
-            break
-        }
-
-        dishList.add(dish)
-    }
-
     fun importDish(dish: Dish): Boolean {
         if(checkIfListContainsDish(dish.name)) {
             if(skipOverwrite) {
@@ -96,7 +74,27 @@ object DishListManager {
         }
     }
 
+    fun addDish() {
+        val dish = Dish("placeholder")
+        println("Enter the name of the dish:")
+        dish.name = readln()
+        if(checkIfListContainsDish(dish.name)) return println("Dish already exists")
 
+        while (true) {
+            println("Enter the Type of the dish (${DishType.entries.joinToString(", ")}:")
+            val typeAsString = getString("Only enter one word of the following: ${DishType.entries.joinToString(", ")}", 100)!!.trim().uppercase()
+            try {
+                dish.dishType = DishType.valueOf(typeAsString)
+            }
+            catch (e: IllegalArgumentException) {
+                println("Could not find a dish type for $typeAsString")
+                continue
+            }
+            break
+        }
+
+        dishList.add(dish)
+    }
 
     fun removeDish() {
         println("Enter the name of the dish:")

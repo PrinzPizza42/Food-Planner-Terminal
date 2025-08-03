@@ -23,7 +23,7 @@ object FoodPlaner {
                 "list" -> listDays()
                 "run" -> generateMealPlan()
                 "add" -> addDay(inputSecondWord)
-                "remove" -> removeDay()
+                "remove" -> removeDay(inputSecondWord)
                 "exit" -> {
                     println("Exiting to food planer main menu...")
                     break
@@ -68,11 +68,24 @@ object FoodPlaner {
         println("Added $amountOfDaysToAdd day(s) to the plan")
     }
 
-    private fun removeDay() {
-        if(days.isEmpty()) return println("No days found")
-        val lastDay = days.last()
-        days.removeLast()
-        println("removing " + lastDay.weekDay + ": " + lastDay.meals.size + " meals")
+    private fun removeDay(inputSecondWord: String?) {
+        val amountOfDaysToRemove: Int = inputSecondWord?.toIntOrNull() ?: 1
+        if(days.isEmpty()) {
+            println("No days found")
+            return
+        }
+        if(amountOfDaysToRemove < 1) {
+            println("Can not remove less than 1")
+            return
+        }
+        if(amountOfDaysToRemove > days.size) {
+            println("Can not remove more days then there are in the list")
+            return
+        }
+        for (i in 1..amountOfDaysToRemove) {
+            days.removeLast()
+        }
+        println("removed $amountOfDaysToRemove day(s)")
     }
 
     private fun generateMealPlan() {
