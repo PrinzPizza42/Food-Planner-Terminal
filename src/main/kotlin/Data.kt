@@ -186,10 +186,12 @@ object Data {
             if(day.meals.isEmpty()) continue
             val mealStringList = mutableListOf<String>()
             for(meal in day.meals) {
-                mealStringList.add("${meal.dish!!.dishType!!.name}: ${meal.dish!!.name}")
+                val mealAbsoluteKCAL = meal.dish?.kCal ?: ""
+                mealStringList.add("${meal.dish!!.dishType!!.name.lowercase()}: ${meal.dish!!.name} - $mealAbsoluteKCAL")
             }
             val mealsString: String = mealStringList.joinToString("\n| - ")
-            val dayString = "|\n|${day.weekDay}\n| - $mealsString"
+            val mealsWithoutKCAL: String = if(day.mealsWithoutKCAL().isNotEmpty()) "- (Did not find KCAL values for: ${day.mealsWithoutKCAL().map { it.dish!!.name }.joinToString(", ")})" else " all kcal found"
+            val dayString = "|\n|${day.weekDay} - ${day.absoluteKCAL()} $mealsWithoutKCAL\n| - $mealsString"
             daysString.addLast(dayString)
         }
         dataPathPlan.appendText(daysString.joinToString("\n"))
